@@ -1,0 +1,28 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+default_stages: [pre-commit]
+repos:
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-json
+      - id: check-merge-conflict
+        args: [--assume-in-merge]
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: detect-private-key
+      - id: no-commit-to-branch
+  - repo: https://github.com/hukkin/mdformat
+    rev: 0.7.22
+    hooks:
+    - id: mdformat
+      args: [--wrap, "100"]
+      additional_dependencies: [mdformat-gfm]
