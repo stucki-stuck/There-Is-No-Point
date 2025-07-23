@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/k3d-io/k3d/refs/heads/main/pkg/config/v1alpha5/schema.json
+# Ref: https://k3d.io/stable/usage/configfile/#all-options-example
+# Ref: https://istio.io/latest/docs/ambient/install/platform-prerequisites/#k3d
+---
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: no-point
+servers: 1
+agents: 2
+image: rancher/k3s:v1.33.2-rc2-k3s1
+registries:
+  create:
+    name: registry.localhost
+    host: "127.0.0.1"
+    hostPort: "5000"
+kubeAPI:
+  hostPort: "6550"
+ports:
+  - port: 9080:80
+    nodeFilters:
+      - loadbalancer
+  - port: 9443:443
+    nodeFilters:
+      - loadbalancer
+options:
+  k3s:
+    extraArgs:
+      - arg: "--disable=traefik"
+        nodeFilters:
+          - server:*

@@ -1,0 +1,7 @@
+---
+formatter:
+  type: basic
+  include_document_start: true
+  force_array_style: block
+  max_line_length: 100
+  retain_line_breaks_single: true

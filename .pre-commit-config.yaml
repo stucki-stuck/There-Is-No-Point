@@ -1,13 +1,18 @@
+---
 default_install_hook_types:
   - pre-commit
   - commit-msg
-default_stages: [pre-commit]
+default_stages:
+  - pre-commit
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.2.0
     hooks:
       - id: conventional-pre-commit
-        stages: [commit-msg]
+        stages:
+          - commit-msg
+        args:
+          - --verbose
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -15,14 +20,23 @@ repos:
       - id: end-of-file-fixer
       - id: check-json
       - id: check-merge-conflict
-        args: [--assume-in-merge]
+        args:
+          - --assume-in-merge
       - id: check-yaml
-        args: [--allow-multiple-documents]
+        args:
+          - --allow-multiple-documents
       - id: detect-private-key
       - id: no-commit-to-branch
   - repo: https://github.com/hukkin/mdformat
     rev: 0.7.22
     hooks:
-    - id: mdformat
-      args: [--wrap, "100"]
-      additional_dependencies: [mdformat-gfm]
+      - id: mdformat
+        args:
+          - --wrap
+          - "100"
+        additional_dependencies:
+          - mdformat-gfm
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.17.2
+    hooks:
+      - id: yamlfmt

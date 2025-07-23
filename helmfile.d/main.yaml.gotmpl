@@ -1,0 +1,54 @@
+# Ref: https://istio.io/latest/docs/ambient/install/helm/
+---
+repositories:
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
+
+releases:
+  - name: istio-base
+    namespace: istio-system
+    createNamespace: true
+    chart: istio/base
+    version: ~1.26.0
+    wait: true
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "apply"
+          - "-f"
+          - "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml"
+
+  - name: istiod
+    namespace: istio-system
+    createNamespace: true
+    chart: istio/istiod
+    version: ~1.26.0
+    wait: true
+    values:
+      - profile: ambient
+    needs:
+      - istio-base
+
+  - name: istio-cni
+    namespace: istio-system
+    createNamespace: true
+    chart: istio/cni
+    version: ~1.26.0
+    wait: true
+    values:
+      - profile: ambient
+        global:
+          platform: k3s
+    needs:
+      - istiod
+
+  - name: ztunnel
+    namespace: istio-system
+    createNamespace: true
+    chart: istio/ztunnel
+    version: ~1.26.0
+    wait: true
+    needs:
+      - istio-cni

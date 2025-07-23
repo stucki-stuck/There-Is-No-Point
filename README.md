@@ -21,3 +21,5 @@ lightweight Kubernetes cluster.
 > _This list will grow as the project evolves._
 
 - Kubernetes (via `k3d`)
+- Helm (via `Helmfile`)
+- Istio
