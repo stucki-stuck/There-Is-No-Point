@@ -1,0 +1,35 @@
+---
+repositories:
+  - name: estahn
+    url: https://estahn.github.io/charts/
+
+releases:
+  - name: httpbingo-mesh
+    chart: ../charts/apps/httpbingo-mesh
+    namespace: httpbin-app
+    createNamespace: true
+    labels:
+      domain: apps
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/gateway-access=true"
+          - "--overwrite"
+
+  - name: httpbingo
+    namespace: httpbin-app
+    createNamespace: true
+    chart: estahn/httpbingo
+    version: ~0.1.1
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/httpbingo.yaml

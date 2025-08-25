@@ -1,5 +1,9 @@
 # Ref: https://istio.io/latest/docs/ambient/install/helm/
 ---
+commonLabels:
+  domain: mesh
+  phase: install
+
 repositories:
   - name: istio
     url: https://istio-release.storage.googleapis.com/charts
@@ -12,7 +16,8 @@ releases:
     version: ~1.26.0
     wait: true
     hooks:
-      - events: ["presync"]
+      - events:
+          - "presync"
         showlogs: true
         command: "kubectl"
         args:
@@ -26,10 +31,10 @@ releases:
     chart: istio/istiod
     version: ~1.26.0
     wait: true
-    values:
-      - profile: ambient
     needs:
       - istio-base
+    values:
+      - ./values/mesh-base/istiod.yaml
 
   - name: istio-cni
     namespace: istio-system
@@ -37,12 +42,10 @@ releases:
     chart: istio/cni
     version: ~1.26.0
     wait: true
-    values:
-      - profile: ambient
-        global:
-          platform: k3s
     needs:
       - istiod
+    values:
+      - ./values/mesh-base/istio-cni.yaml
 
   - name: ztunnel
     namespace: istio-system

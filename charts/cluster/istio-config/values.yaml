@@ -1,0 +1,6 @@
+---
+gateway:
+  deployment:
+    labels:
+      default-label: set-by-istio-config
+      default-label-override: set-by-istio-config-will-be-override-by-istio-ingress

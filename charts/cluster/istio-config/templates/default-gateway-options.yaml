@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: default-gateway-options
+  labels:
+    {{- include "istio-config.labels" . | nindent 4 }}
+    gateway.istio.io/defaults-for-class: istio
+data:
+  {{- with .Values.gateway.deployment.labels }}
+  deployment: |
+    metadata:
+      labels:
+        {{- toYaml . | nindent 8 }}
+  {{- end }}

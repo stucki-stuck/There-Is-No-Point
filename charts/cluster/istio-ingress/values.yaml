@@ -1,0 +1,9 @@
+---
+hostnameGlob: "*.there-is-no-point.localhost"
+hpa:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+deployment:
+  labels:
+    gateway-options-deployment: set-by-istio-ingress

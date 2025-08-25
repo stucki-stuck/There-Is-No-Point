@@ -1,0 +1,5 @@
+---
+image:
+  tag: "2.18"
+service:
+  port: 8000

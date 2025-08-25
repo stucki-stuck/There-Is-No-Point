@@ -25,6 +25,7 @@ repos:
       - id: check-yaml
         args:
           - --allow-multiple-documents
+        exclude: "templates/"
       - id: detect-private-key
       - id: no-commit-to-branch
   - repo: https://github.com/hukkin/mdformat
@@ -40,3 +41,4 @@ repos:
     rev: v0.17.2
     hooks:
       - id: yamlfmt
+        exclude: "templates/"

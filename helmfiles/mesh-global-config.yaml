@@ -1,0 +1,16 @@
+# Ref: https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
+---
+commonLabels:
+  domain: mesh
+  phase: config
+
+releases:
+  - name: istio-config
+    namespace: istio-system
+    createNamespace: true
+    chart: ../charts/cluster/istio-config
+
+  - name: istio-ingress
+    namespace: istio-ingress
+    createNamespace: true
+    chart: ../charts/cluster/istio-ingress

@@ -1,0 +1,7 @@
+---
+apiVersion: v2
+name: httpbingo-mesh
+description: mesh configuration for httpbingo
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

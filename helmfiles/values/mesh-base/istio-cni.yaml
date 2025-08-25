@@ -1,0 +1,4 @@
+---
+global:
+  platform: k3s # Not k3d : https://github.com/istio/istio/pull/57110
+profile: ambient
