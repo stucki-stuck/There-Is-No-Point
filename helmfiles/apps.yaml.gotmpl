@@ -21,9 +21,10 @@ releases:
           - "namespace"
           - "{{`{{.Release.Namespace}}`}}"
           - "istio.io/gateway-access=true"
+          - "istio.io/dataplane-mode=ambient"
           - "--overwrite"
 
-  - name: httpbingo
+  - name: httpbingo-a
     namespace: httpbin-app
     createNamespace: true
     chart: estahn/httpbingo
@@ -32,4 +33,26 @@ releases:
       domain: apps
       phase: install
     values:
-      - ./values/apps/httpbingo.yaml
+      - ./values/apps/httpbingo-a.yaml
+
+  - name: httpbingo-b
+    namespace: httpbin-app
+    createNamespace: true
+    chart: estahn/httpbingo
+    version: ~0.1.1
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/httpbingo-b.yaml
+
+  - name: httpbingo-c
+    namespace: httpbin-app
+    createNamespace: true
+    chart: estahn/httpbingo
+    version: ~0.1.1
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/httpbingo-c.yaml

@@ -26,5 +26,12 @@ spec:
         - name: my-added-header
           value: added-value
     backendRefs:
-    - name: {{ .Values.app.serviceName }}
-      port: {{ .Values.app.servicePort }}
+    - name: {{ .Values.apps.httpbingoA.serviceName }}
+      port: {{ .Values.apps.httpbingoA.servicePort }}
+      weight: 60
+    - name: {{ .Values.apps.httpbingoB.serviceName }}
+      port: {{ .Values.apps.httpbingoB.servicePort }}
+      weight: 30
+    - name: {{ .Values.apps.httpbingoC.serviceName }}
+      port: {{ .Values.apps.httpbingoC.servicePort }}
+      weight: 10

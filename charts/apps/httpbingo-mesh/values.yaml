@@ -1,7 +1,14 @@
 ---
-app:
-  serviceName: httpbingo
-  servicePort: 8000
+apps:
+  httpbingoA:
+    serviceName: httpbingo-a
+    servicePort: 8000
+  httpbingoB:
+    serviceName: httpbingo-b
+    servicePort: 8000
+  httpbingoC:
+    serviceName: httpbingo-c
+    servicePort: 8000
 
 gateway:
   name: main-gateway
