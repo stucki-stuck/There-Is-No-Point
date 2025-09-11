@@ -1,0 +1,12 @@
+---
+usedForAccess: false
+gateway:
+  name: ""
+  namespace: ""
+  hostname: ""
+
+addAWaypoint: false
+waypointService:
+  port: ""
+
+rules: []

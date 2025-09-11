@@ -1,0 +1,16 @@
+---
+addAWaypoint: true
+waypointService:
+  port: 9080
+
+rules:
+  - backendRefs:
+      - name: reviews-app-v1
+        port: 9080
+        weight: 60
+      - name: reviews-app-v2
+        port: 9080
+        weight: 30
+      - name: reviews-app-v3
+        port: 9080
+        weight: 10

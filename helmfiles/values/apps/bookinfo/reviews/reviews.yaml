@@ -1,0 +1,30 @@
+---
+image:
+  repository: istio/examples-bookinfo-reviews-v1
+  tag: "1.20.3"
+service:
+  port: 9080
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+volumes:
+  - name: wlp-output
+    emptyDir: {}
+  - name: tmp
+    emptyDir: {}
+volumeMounts:
+  - name: tmp
+    mountPath: /tmp
+  - name: wlp-output
+    mountPath: /opt/ibm/wlp/output
+env:
+  - name: LOG_DIR
+    value: "/tmp/logs"
+  - name: RATINGS_HOSTNAME
+    value: "ratings-app.ratings"

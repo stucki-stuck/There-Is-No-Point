@@ -5,7 +5,7 @@ repositories:
 
 releases:
   - name: httpbingo-mesh
-    chart: ../charts/apps/httpbingo-mesh
+    chart: ../charts/meshes/httpbingo-mesh
     namespace: httpbin-app
     createNamespace: true
     labels:
@@ -33,7 +33,7 @@ releases:
       domain: apps
       phase: install
     values:
-      - ./values/apps/httpbingo-a.yaml
+      - ./values/apps/httpbingo/httpbingo-a.yaml
 
   - name: httpbingo-b
     namespace: httpbin-app
@@ -44,7 +44,7 @@ releases:
       domain: apps
       phase: install
     values:
-      - ./values/apps/httpbingo-b.yaml
+      - ./values/apps/httpbingo/httpbingo-b.yaml
 
   - name: httpbingo-c
     namespace: httpbin-app
@@ -55,4 +55,4 @@ releases:
       domain: apps
       phase: install
     values:
-      - ./values/apps/httpbingo-c.yaml
+      - ./values/apps/httpbingo/httpbingo-c.yaml

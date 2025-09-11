@@ -1,0 +1,28 @@
+---
+replicaCount: 1
+image:
+  repository: ""
+  pullPolicy: IfNotPresent
+  tag: ""
+imagePullSecrets: []
+service:
+  type: ClusterIP
+  port: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+livenessProbe: {}
+readinessProbe: {}
+volumes: []
+volumeMounts: []
+env: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

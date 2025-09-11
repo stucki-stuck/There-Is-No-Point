@@ -1,0 +1,14 @@
+{{- if .Values.waypointService }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: waypoint
+  labels:
+    {{- include "mesh.labels" . | nindent 4 }}
+spec:
+  gatewayClassName: istio-waypoint
+  listeners:
+  - name: mesh
+    port: 15008
+    protocol: HBONE
+{{- end }}

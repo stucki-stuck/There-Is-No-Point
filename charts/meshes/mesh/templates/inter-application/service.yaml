@@ -1,0 +1,11 @@
+{{- if .Values.addAWaypoint }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mesh.fullname" . }}
+  labels:
+    {{- include "mesh.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: {{ .Values.waypointService.port }}
+{{- end }}

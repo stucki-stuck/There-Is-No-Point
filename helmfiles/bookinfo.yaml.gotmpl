@@ -1,0 +1,161 @@
+# Ref: https://istio.io/latest/docs/ambient/getting-started/deploy-sample-app/
+# Ref: https://istio.io/latest/docs/examples/bookinfo/
+# Ref: https://istio.io/latest/docs/concepts/traffic-management/
+# Ref: https://istio.io/latest/docs/ambient/usage/waypoint/
+# Ref: https://istio.io/latest/docs/ambient/usage/add-workloads/
+# Ref: https://istio.io/latest/docs/ambient/usage/verify-mtls-enabled/
+---
+releases:
+  # Product Page
+  - name: product-page-mesh
+    chart: ../charts/meshes/mesh
+    namespace: product-page
+    createNamespace: true
+    labels:
+      domain: apps
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/gateway-access=true"
+          - "istio.io/dataplane-mode=ambient"
+          - "--overwrite"
+    values:
+      - ./values/meshes/bookinfo/product-page.yaml
+
+  - name: product-page-app
+    namespace: product-page
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/bookinfo/product-page.yaml
+
+  # Reviews
+  - name: reviews-mesh
+    chart: ../charts/meshes/mesh
+    namespace: reviews
+    createNamespace: true
+    labels:
+      domain: apps
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/dataplane-mode=ambient"
+          - "istio.io/use-waypoint=waypoint"
+          - "--overwrite"
+    values:
+      - ./values/meshes/bookinfo/reviews.yaml
+
+  - name: reviews-app-v1
+    namespace: reviews
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/bookinfo/reviews/reviews.yaml
+
+  - name: reviews-app-v2
+    namespace: reviews
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/bookinfo/reviews/reviews.yaml
+      - ./values/apps/bookinfo/reviews/reviews-v2.yaml
+
+  - name: reviews-app-v3
+    namespace: reviews
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/bookinfo/reviews/reviews.yaml
+      - ./values/apps/bookinfo/reviews/reviews-v3.yaml
+
+  # Ratings
+  - name: ratings-mesh
+    chart: ../charts/meshes/mesh
+    namespace: ratings
+    createNamespace: true
+    labels:
+      domain: apps
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/dataplane-mode=ambient"
+          - "istio.io/use-waypoint=waypoint"
+          - "--overwrite"
+    values:
+      - ./values/meshes/bookinfo/ratings.yaml
+
+  - name: ratings-app
+    namespace: ratings
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/bookinfo/ratings.yaml
+
+  # Details
+  - name: details-mesh
+    chart: ../charts/meshes/mesh
+    namespace: details
+    createNamespace: true
+    labels:
+      domain: apps
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/dataplane-mode=ambient"
+          - "istio.io/use-waypoint=waypoint"
+          - "--overwrite"
+    values:
+      - ./values/meshes/bookinfo/details.yaml
+
+  - name: details-app
+    namespace: details
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/bookinfo/details.yaml
