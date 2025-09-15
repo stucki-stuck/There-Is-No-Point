@@ -19,8 +19,8 @@ sleep 1
 set +x
 echo -e "\e[32mReview version distribution (should be 60/30/10) (100 requests): \e[0m"
 for i in $(seq 1 100); do
-  curl -s http://productpage.there-is-no-point.localhost/productpage \
-    | grep -oE 'reviews-app-v[0-9]+' \
-    | head -n1
+  curl -s http://productpage.there-is-no-point.localhost/productpage |
+    grep -oE 'reviews-app-v[0-9]+' |
+    head -n1
 done | sort | uniq -c
 set -x
