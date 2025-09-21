@@ -1,4 +1,4 @@
-{{- if .Values.usedForAccess }}
+{{- if .Values.networking.usedForAccess }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -8,13 +8,13 @@ metadata:
     {{- include "mesh.labels" . | nindent 4 }}
 spec:
   parentRefs:
-  - name: {{ .Values.gateway.name }}
-    namespace: {{ .Values.gateway.namespace }}
-  {{- with .Values.gateway.hostname }}
+  - name: {{ .Values.networking.gateway.name }}
+    namespace: {{ .Values.networking.gateway.namespace }}
+  {{- with .Values.networking.gateway.hostname }}
   hostnames:
     - {{ . | quote }}
   {{- end }}
-  {{- with .Values.rules }}
+  {{- with .Values.networking.rules }}
   rules:
     {{- toYaml . | nindent 4 }}
   {{- end }}

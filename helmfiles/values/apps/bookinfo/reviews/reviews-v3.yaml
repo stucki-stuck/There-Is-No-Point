@@ -1,3 +1,7 @@
 ---
 image:
   repository: "istio/examples-bookinfo-reviews-v3"
+
+serviceAccount:
+  create: false
+  name: "reviews-app"

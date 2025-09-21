@@ -1,0 +1,25 @@
+{{- if .Values.authorization.addAuthorizations }}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ include "mesh.fullname" . }}
+  labels:
+    {{- include "mesh.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.networking.addAWaypoint }}
+  targetRefs:
+    - kind: Service
+      group: ""
+      name: {{ include "mesh.fullname" . }}
+  {{- else }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
+  {{- end }}
+  action: ALLOW
+  {{- with .Values.authorization.rules }}
+  rules:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

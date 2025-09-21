@@ -1,0 +1,19 @@
+{{- if .Values.networking.addAWaypoint }}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ include "mesh.fullname" . }}-from-waypoint
+  labels:
+    {{- include "mesh.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance-group: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/{{ .Release.Namespace }}/sa/waypoint
+{{- end }}

@@ -42,5 +42,9 @@ Selector labels
 */}}
 {{- define "mesh.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "mesh.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ include "mesh.fullname" . }}
+{{- end }}
+
+{{- define "mesh.toAppName" -}}
+{{- replace "-mesh" "-app" . -}}
 {{- end }}

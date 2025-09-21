@@ -28,3 +28,7 @@ env:
     value: "/tmp/logs"
   - name: RATINGS_HOSTNAME
     value: "ratings-app.ratings"
+
+serviceAccount:
+  create: true
+  name: "reviews-app"

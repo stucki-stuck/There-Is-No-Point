@@ -1,0 +1,12 @@
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: default-deny-waypoint
+  labels:
+    {{- include "istio-config.labels" . | nindent 4 }}
+spec:
+  targetRefs:
+  - kind: GatewayClass
+    group: gateway.networking.k8s.io
+    name: istio-waypoint

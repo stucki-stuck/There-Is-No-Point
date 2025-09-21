@@ -1,0 +1,11 @@
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  labels:
+    {{- include "istio-ingress.labels" . | nindent 4 }}
+spec:
+  action: ALLOW
+  rules:
+  - {}

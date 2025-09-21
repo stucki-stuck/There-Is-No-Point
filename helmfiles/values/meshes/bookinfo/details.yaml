@@ -1,1 +1,8 @@
 ---
+authorization:
+  addAuthorizations: true
+  rules:
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/product-page/sa/product-page-app

@@ -42,7 +42,8 @@ Selector labels
 */}}
 {{- define "app.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "app.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ include "app.fullname" . }}
+app.kubernetes.io/instance-group: {{ regexReplaceAll (printf "(-%s).*" .Chart.Name) (include "app.fullname" .) "${1}" -}}
 {{- end }}
 
 {{/*
@@ -54,4 +55,8 @@ Create the name of the service account to use
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{- define "app.toMeshName" -}}
+{{- replace "-app" "-mesh" . -}}
 {{- end }}

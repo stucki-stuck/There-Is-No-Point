@@ -1,12 +1,17 @@
 ---
-usedForAccess: false
-gateway:
-  name: ""
-  namespace: ""
-  hostname: ""
+networking:
+  usedForAccess: false
+  gateway:
+    name: ""
+    namespace: ""
+    hostname: ""
 
-addAWaypoint: false
-waypointService:
-  port: ""
+  addAWaypoint: false
+  waypointService:
+    port: ""
 
-rules: []
+  rules: []
+
+authorization:
+  addAuthorizations: false
+  rules: []
