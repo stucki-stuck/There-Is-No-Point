@@ -12,8 +12,15 @@ spec:
     kind: Service
     name: {{ include "mesh.fullname" . }}
     port: {{ .Values.networking.waypointService.port }}
+  {{- if .Values.networking.rules }}
   {{- with .Values.networking.rules }}
   rules:
     {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  rules:
+    - backendRefs:
+      - name: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
+        port: {{ .Values.networking.waypointService.port }}
   {{- end }}
 {{- end }}

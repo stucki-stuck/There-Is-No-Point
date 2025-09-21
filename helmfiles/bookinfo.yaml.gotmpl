@@ -4,6 +4,9 @@
 # Ref: https://istio.io/latest/docs/ambient/usage/waypoint/
 # Ref: https://istio.io/latest/docs/ambient/usage/add-workloads/
 # Ref: https://istio.io/latest/docs/ambient/usage/verify-mtls-enabled/
+# Ref: https://istio.io/latest/docs/concepts/security/#authorization
+# Ref: https://istio.io/latest/docs/ambient/getting-started/enforce-auth-policies/
+# Ref: https://istio.io/latest/docs/reference/config/security/authorization-policy/
 ---
 releases:
   # Product Page
@@ -112,6 +115,7 @@ releases:
           - "namespace"
           - "{{`{{.Release.Namespace}}`}}"
           - "istio.io/dataplane-mode=ambient"
+          - "istio.io/use-waypoint=waypoint"
           - "--overwrite"
     values:
       - ./values/meshes/bookinfo/ratings.yaml

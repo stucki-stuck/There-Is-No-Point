@@ -23,3 +23,9 @@ authorization:
         - source:
             principals:
               - cluster.local/ns/product-page/sa/product-page-app
+      to:
+        - operation:
+            methods:
+              - GET
+            paths:
+              - "/reviews/{*}"

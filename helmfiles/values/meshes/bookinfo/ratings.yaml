@@ -1,4 +1,9 @@
 ---
+networking:
+  addAWaypoint: true
+  waypointService:
+    port: 9080
+
 authorization:
   addAuthorizations: true
   rules:
@@ -6,3 +11,9 @@ authorization:
         - source:
             principals:
               - cluster.local/ns/reviews/sa/reviews-app
+      to:
+        - operation:
+            methods:
+              - GET
+            paths:
+              - "/ratings/{*}"

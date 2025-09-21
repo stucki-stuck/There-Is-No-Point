@@ -27,7 +27,7 @@ env:
   - name: LOG_DIR
     value: "/tmp/logs"
   - name: RATINGS_HOSTNAME
-    value: "ratings-app.ratings"
+    value: "ratings-mesh.ratings"
 
 serviceAccount:
   create: true
