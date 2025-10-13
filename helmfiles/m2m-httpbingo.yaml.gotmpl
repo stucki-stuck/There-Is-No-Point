@@ -1,0 +1,44 @@
+# Ref: https://istio.io/latest/docs/tasks/security/authorization/authz-jwt/
+---
+releases:
+  - name: httpbingo-mesh
+    chart: ../charts/meshes/mesh
+    namespace: m2m-httpbin
+    createNamespace: true
+    labels:
+      domain: apps
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/dataplane-mode=ambient"
+          - "istio.io/use-waypoint=waypoint"
+          - "--overwrite"
+    values:
+      - ./values/meshes/m2m-httpbingo/httpbingo.yaml
+
+  - name: httpbingo-app
+    namespace: m2m-httpbin
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/m2m-httpbingo/httpbingo.yaml
+
+  - name: curl-app
+    namespace: m2m-httpbin
+    createNamespace: true
+    chart: ../charts/apps/app
+    labels:
+      domain: apps
+      phase: install
+    values:
+      - ./values/apps/m2m-httpbingo/curl.yaml

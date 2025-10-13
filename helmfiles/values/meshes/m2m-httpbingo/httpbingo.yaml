@@ -1,0 +1,32 @@
+---
+networking:
+  addAWaypoint: true
+  waypointService:
+    port: 8080
+
+authorization:
+  addAuthorizations: true
+  jwtRules:
+    - issuer: "testing@secure.istio.io"
+      jwksUri: "https://raw.githubusercontent.com/istio/istio/release-1.27/security/tools/jwt/samples/jwks.json"
+  rules:
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/m2m-httpbin/sa/curl-app
+            requestPrincipals:
+              - "testing@secure.istio.io/testing@secure.istio.io"
+      to:
+        - operation:
+            paths:
+              - "/headers"
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/m2m-httpbin/sa/curl-app
+            requestPrincipals:
+              - "testing@secure.istio.io/testing@secure.istio.io"
+      when:
+        - key: request.auth.claims[groups]
+          values:
+            - "group1"

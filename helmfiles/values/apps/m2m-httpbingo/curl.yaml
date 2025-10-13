@@ -1,0 +1,9 @@
+---
+image:
+  repository: curlimages/curl
+  tag: "8.16.0"
+service:
+  port: 80
+command:
+  - "/bin/sleep"
+  - "infinity"

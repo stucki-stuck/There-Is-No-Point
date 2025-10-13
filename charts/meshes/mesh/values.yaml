@@ -14,4 +14,5 @@ networking:
 
 authorization:
   addAuthorizations: false
+  jwtRules: []
   rules: []

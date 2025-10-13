@@ -1,0 +1,18 @@
+{{- if and .Values.networking.addAWaypoint .Values.authorization.jwtRules }}
+---
+apiVersion: security.istio.io/v1
+kind: RequestAuthentication
+metadata:
+  name: jwt-rule
+  labels:
+    {{- include "mesh.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: waypoint
+  {{- with .Values.authorization.jwtRules }}
+  jwtRules:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

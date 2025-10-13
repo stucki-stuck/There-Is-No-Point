@@ -23,6 +23,7 @@ readinessProbe: {}
 volumes: []
 volumeMounts: []
 env: []
+command: []
 nodeSelector: {}
 tolerations: []
 affinity: {}

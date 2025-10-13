@@ -1,0 +1,6 @@
+---
+image:
+  repository: mccutchen/go-httpbin
+  tag: "2.18"
+service:
+  port: 8080
