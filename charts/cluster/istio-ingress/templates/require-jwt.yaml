@@ -1,0 +1,25 @@
+{{- if .Values.requireJwtHostname }}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: require-jwt
+  labels:
+    {{- include "istio-ingress.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    kind: Gateway
+    group: gateway.networking.k8s.io
+    name: main-gateway
+  action: DENY
+  rules:
+    - from:
+        - source:
+            notRequestPrincipals: ["*"]
+      to:
+        - operation:
+            hosts:
+            {{- range .Values.requireJwtHostname }}
+              - {{ . | quote }}
+            {{- end }}
+{{- end }}

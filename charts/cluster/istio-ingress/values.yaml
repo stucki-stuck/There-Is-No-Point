@@ -7,3 +7,8 @@ hpa:
 deployment:
   labels:
     gateway-options-deployment: set-by-istio-ingress
+jwtRules:
+  - issuer: "testing@secure.istio.io"
+    jwksUri: "https://raw.githubusercontent.com/istio/istio/release-1.27/security/tools/jwt/samples/jwks.json"
+requireJwtHostname:
+  - httpbin.there-is-no-point.localhost
