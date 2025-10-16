@@ -1,0 +1,27 @@
+load("ext://namespace", "namespace_create", "namespace_inject")
+
+docker_build(
+    "istio/examples-bookinfo-productpage-v1:1.20.3",
+    context=".",
+    only=["./src", "./pyproject.toml", "./uv.lock", "README.md"],
+    ignore=str(read_file("./.dockerignore", default="")).splitlines(),
+    dockerfile="./Dockerfile",
+    target="dev",
+    live_update=[
+        fall_back_on(["./uv.lock"]),
+        sync("./src/", "/app/src/"),
+    ],
+)
+
+namespace_create("product-page")
+local(
+    'kubectl get deployments.apps -n product-page -o yaml | grep -q "app.kubernetes.io/managed-by: Helm" && kubectl delete deployments.apps -n product-page --all || true'
+)
+k8s_yaml(
+    namespace_inject(
+        local(
+            "helmfile template --skip-deps -f ../../helmfiles/bookinfo.yaml.gotmpl -l name=product-page-app --set securityContext=null --set livenessProbe=null --set readinessProbe=null"
+        ),
+        "product-page",
+    )
+)
