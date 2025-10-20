@@ -4,4 +4,5 @@ helmfiles:
   - path: helmfiles/mesh-global-config.yaml
   - path: helmfiles/httpbingo.yaml.gotmpl
   - path: helmfiles/m2m-httpbingo.yaml.gotmpl
+  - path: helmfiles/dependencies.yaml.gotmpl
   - path: helmfiles/bookinfo.yaml.gotmpl

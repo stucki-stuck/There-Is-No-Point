@@ -1,0 +1,13 @@
+{
+  "realm": "there-is-no-point",
+  "roles": {
+    "realm": [
+      {
+        "name": "reviews:read"
+      },
+      {
+        "name": "details:read"
+      }
+    ]
+  }
+}

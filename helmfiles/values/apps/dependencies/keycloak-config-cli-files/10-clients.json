@@ -1,0 +1,12 @@
+{
+  "realm": "there-is-no-point",
+  "clients": [
+    {
+      "clientId": "productpage-password-grant",
+      "enabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect"
+    }
+  ]
+}

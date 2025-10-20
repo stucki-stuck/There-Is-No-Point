@@ -1,0 +1,18 @@
+---
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: public.ecr.aws
+  repository: bitnami/postgresql
+  tag: 17.6.0-debian-12-r4
+architecture: standalone
+primary:
+  networkPolicy:
+    enabled: false
+auth:
+  postgresPassword: supersecret
+  username: keycloak
+  password: supersecret
+  database: keycloak

@@ -1,0 +1,30 @@
+---
+# Istiod needs to talk to Keycloak to contact jwksUri
+# https://github.com/istio/istio/issues/10819#issuecomment-468835791
+permissiveMtls: true
+
+networking:
+  usedForAccess: true
+  gateway:
+    name: main-gateway
+    namespace: istio-ingress
+    hostname: "keycloak.there-is-no-point.localhost"
+  rules:
+    - backendRefs:
+        - name: keycloak-app
+          port: 80
+
+authorization:
+  addAuthorizations: true
+  rules:
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/istio-ingress/sa/main-gateway-istio
+              - cluster.local/ns/product-page/sa/product-page-app
+    - {} # FIXME: If I don't allow all traffic to Keycloak, Istiod cannot contact the jwksUri.
+    # I couldn't find a solution to allow only traffic from Istiod.
+    # TODO:
+    # - Try adding a waypoint in front of Keycloak
+    # - Open an issue on the Istio project, to ask for help.
+    # May be related to: https://github.com/istio/istio/issues/10819#issuecomment-468835791

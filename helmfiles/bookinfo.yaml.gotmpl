@@ -148,6 +148,7 @@ releases:
           - "namespace"
           - "{{`{{.Release.Namespace}}`}}"
           - "istio.io/dataplane-mode=ambient"
+          - "istio.io/use-waypoint=waypoint"
           - "--overwrite"
     values:
       - ./values/meshes/bookinfo/details.yaml

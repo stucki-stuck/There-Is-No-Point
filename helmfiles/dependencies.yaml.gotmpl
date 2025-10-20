@@ -1,0 +1,79 @@
+# Ref: https://istio.io/latest/docs/tasks/security/authorization/authz-jwt/
+# Ref: https://adorsys.github.io/keycloak-config-cli/
+# Ref: https://github.com/bitnami/charts/tree/main/bitnami/keycloak
+---
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: keycloak-postgresql-mesh
+    chart: ../charts/meshes/mesh
+    namespace: keycloak
+    createNamespace: true
+    labels:
+      domain: dependencies
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/dataplane-mode=ambient"
+          - "--overwrite"
+    values:
+      - ./values/meshes/dependencies/keycloak-postgresql.yaml
+
+  - name: keycloak-postgresql-app
+    namespace: keycloak
+    createNamespace: true
+    chart: bitnami/postgresql
+    version: 16.7.26
+    wait: true
+    labels:
+      domain: dependencies
+      phase: install
+    values:
+      - ./values/apps/dependencies/keycloak-postgresql.yaml
+
+  - name: keycloak-mesh
+    chart: ../charts/meshes/mesh
+    namespace: keycloak
+    createNamespace: true
+    needs:
+      - keycloak-postgresql-app
+    labels:
+      domain: dependencies
+      phase: mesh
+    hooks:
+      - events:
+          - postsync
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "label"
+          - "namespace"
+          - "{{`{{.Release.Namespace}}`}}"
+          - "istio.io/dataplane-mode=ambient"
+          - "istio.io/gateway-access=true"
+          - "--overwrite"
+    values:
+      - ./values/meshes/dependencies/keycloak.yaml
+
+  - name: keycloak-app
+    namespace: keycloak
+    createNamespace: true
+    chart: bitnami/keycloak
+    version: 25.2.0
+    wait: true
+    needs:
+      - keycloak-postgresql-app
+    labels:
+      domain: dependencies
+      phase: install
+    values:
+      - ./values/apps/dependencies/keycloak.yaml.gotmpl

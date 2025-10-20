@@ -1,0 +1,40 @@
+{
+  "realm": "there-is-no-point",
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "email": "alice.aln@there-is-no-point.localhost",
+      "firstName": "alice",
+      "lastName": "aln",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alicepwd",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "reviews:read",
+        "details:read"
+      ]
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "email": "bob.bln@there-is-no-point.localhost",
+      "firstName": "bob",
+      "lastName": "bln",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bobpwd",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "details:read"
+      ]
+    }
+  ]
+}

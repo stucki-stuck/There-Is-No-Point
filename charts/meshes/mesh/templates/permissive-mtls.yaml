@@ -1,0 +1,15 @@
+{{- if .Values.permissiveMtls }}
+---
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: permissive-mtls
+  labels:
+    {{- include "mesh.labels" . | nindent 4 }}
+spec:
+  mtls:
+    mode: PERMISSIVE
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
+{{- end }}

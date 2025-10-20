@@ -1,0 +1,8 @@
+---
+authorization:
+  addAuthorizations: true
+  rules:
+    - from:
+        - source:
+            principals:
+              - cluster.local/ns/keycloak/sa/keycloak-app

@@ -1,0 +1,48 @@
+---
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: public.ecr.aws
+  repository: bitnami/keycloak
+  tag: 26.3.4-debian-12-r1
+auth:
+  adminUser: admin
+  adminPassword: supersecret
+production: false
+httpEnabled: true
+logging:
+  level: INFO
+networkPolicy:
+  enabled: false
+livenessProbe:
+  initialDelaySeconds: 200
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 4
+    memory: 4096Mi
+
+postgresql:
+  enabled: false
+
+externalDatabase:
+  host: keycloak-postgresql-app.keycloak
+  user: keycloak
+  password: supersecret
+  database: keycloak
+
+keycloakConfigCli:
+  enabled: true
+  image:
+    registry: public.ecr.aws
+    repository: bitnami/keycloak-config-cli
+    tag: 6.4.0-debian-12-r13
+  configuration:
+  {{- range $_, $path := readDir "./keycloak-config-cli-files" }}
+    {{ base $path }}: |-
+{{ readFile $path | indent 6 }}
+  {{- end }}

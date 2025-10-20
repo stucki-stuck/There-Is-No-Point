@@ -5,7 +5,6 @@ networking:
     name: main-gateway
     namespace: istio-ingress
     hostname: "productpage.there-is-no-point.localhost"
-
   rules:
     - matches:
         - path:

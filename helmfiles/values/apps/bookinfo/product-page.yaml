@@ -32,4 +32,4 @@ env:
   - name: REVIEWS_HOSTNAME
     value: "reviews-mesh.reviews"
   - name: DETAILS_HOSTNAME
-    value: "details-app.details"
+    value: "details-mesh.details"

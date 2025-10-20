@@ -1,4 +1,6 @@
 ---
+permissiveMtls: false
+
 networking:
   usedForAccess: false
   gateway:

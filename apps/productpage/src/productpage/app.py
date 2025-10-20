@@ -16,6 +16,19 @@
 
 import time
 from flask import Flask, request, session, render_template, redirect, g
+import asyncio
+# These two lines enable debugging at httplib level (requests->urllib3->http.client)
+# You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
+# The only thing missing will be the response.body which is not logged.
+import http.client as http_client
+import logging
+import os
+import sys
+import time
+import httpx
+import requests
+import simplejson as json
+from flask import Flask, g, make_response, redirect, render_template, request, session
 from json2html import json2html
 from opentelemetry import trace
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -35,6 +48,7 @@ import sys
 # You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
 # The only thing missing will be the response.body which is not logged.
 import http.client as http_client
+
 http_client.HTTPConnection.debuglevel = 0
 
 app = Flask(__name__)
@@ -88,6 +102,13 @@ service_dict = {
     "details": details,
     "reviews": reviews,
 }
+
+# Changed
+KEYCLOAK_BASE_URL = "http://keycloak-app.keycloak"
+REALM = "there-is-no-point"
+CLIENT_ID = "productpage-password-grant"
+TOKEN_URL = f"{KEYCLOAK_BASE_URL}/realms/{REALM}/protocol/openid-connect/token"
+USERINFO_URL = f"{KEYCLOAK_BASE_URL}/realms/{REALM}/protocol/openid-connect/userinfo"
 
 request_result_counter = Counter('request_result', 'Results of requests', ['destination_app', 'response_code'])
 
@@ -222,18 +243,46 @@ def health():
     return 'Product page is healthy'
 
 
+# Changed
 @app.route('/login', methods=['POST'])
 def login():
     user = request.values.get('username')
+    password = request.values.get('passwd')
+    if not user or not password:
+        return app.make_response(redirect(request.referrer))
+
+    data = {
+        "grant_type": "password",
+        "client_id": CLIENT_ID,
+        "username": user,
+        "password": password,
+        "scope": "openid profile email",
+    }
+    try:
+        with httpx.Client(timeout=10) as client:
+            token_response = client.post(TOKEN_URL, data=data)
+            token_response.raise_for_status()
+            token = token_response.json()
+            userinfo_response = client.get(
+                USERINFO_URL,
+                headers={"Authorization": f"Bearer {token['access_token']}"},
+            )
+            userinfo_response.raise_for_status()
+            userinfo = userinfo_response.json()
+    except Exception:
+        return app.make_response(redirect(request.referrer))
+
     response = app.make_response(redirect(request.referrer))
-    session['user'] = user
+    session["auth"] = {"token": token, "userinfo": userinfo}
+    session["user"] = userinfo.get("preferred_username") or userinfo.get("email") or user
     return response
 
-
+# Changed
 @app.route('/logout', methods=['GET'])
 def logout():
     response = app.make_response(redirect(request.referrer))
-    session.pop('user', None)
+    session.pop("auth", None)
+    session.pop("user", None)
     return response
 
 # a helper function for asyncio.gather, does not return a value
@@ -378,9 +427,47 @@ def getProductRatings(product_id, headers):
         return status, {'error': 'Sorry, product ratings are currently unavailable for this book.'}
 
 
+# Changed
+def _get_access_token_if_any():
+    auth = session.get("auth")
+    if not auth:
+        return None
+    token = auth.get("token",{})
+    access_token = token.get("access_token")
+    expires_at = int(token.get("expires_at", 0))
+    if access_token and int(time.time()) < expires_at - 30:
+        return access_token
+
+    refresh_token = token.get("refresh_token")
+    if not refresh_token:
+        return None
+
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "client_id": CLIENT_ID,
+    }
+    try:
+        with httpx.Client(timeout=10) as client:
+            response = client.post(TOKEN_URL, data=data)
+            response.raise_for_status()
+            new_token = response.json()
+    except Exception:
+        session.pop("auth", None)
+        session.pop("user", None)
+        return None
+    auth["token"].update(new_token)
+    session["auth"] = auth
+    return new_token.get("access_token")
+
+
+# Changed
 def send_request(url, **kwargs):
-    # We intentionally do not pool so that we can easily test load distribution across many versions of our backends
-    return requests.get(url, **kwargs)
+    headers = dict(kwargs.pop("headers", {}))
+    access = _get_access_token_if_any()
+    if access:
+        headers["Authorization"] = f"Bearer {access}"
+    return requests.get(url, headers=headers, **kwargs)
 
 
 class Writer(object):
