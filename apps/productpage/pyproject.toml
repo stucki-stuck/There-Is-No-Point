@@ -34,8 +34,17 @@ dependencies = [
 [dependency-groups]
 dev = [
     "requests-mock==1.5.2",
+    "ruff",
+    "mypy",
+    "types-requests",
+    "types-simplejson",
 ]
 
 [build-system]
 requires = ["uv_build>=0.8.22,<0.9.0"]
 build-backend = "uv_build"
+
+[tool.ruff]
+exclude = [".venv"]
+line-length = 100
+src = ["src","Tiltfile"]

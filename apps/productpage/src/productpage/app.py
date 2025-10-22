@@ -14,17 +14,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import time
-from flask import Flask, request, session, render_template, redirect, g
-import asyncio
 # These two lines enable debugging at httplib level (requests->urllib3->http.client)
 # You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
 # The only thing missing will be the response.body which is not logged.
+import asyncio
 import http.client as http_client
 import logging
 import os
 import sys
 import time
+
 import httpx
 import requests
 import simplejson as json
@@ -36,18 +35,6 @@ from opentelemetry.propagate import set_global_textmap
 from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.sdk.trace import TracerProvider
 from prometheus_client import Counter, generate_latest
-import asyncio
-import logging
-import os
-import requests
-import simplejson as json
-import sys
-
-
-# These two lines enable debugging at httplib level (requests->urllib3->http.client)
-# You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
-# The only thing missing will be the response.body which is not logged.
-import http.client as http_client
 
 http_client.HTTPConnection.debuglevel = 0
 
@@ -63,38 +50,66 @@ app.logger.setLevel(logging.INFO)
 # Set the secret key to some random bytes. Keep this really secret!
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
-servicesDomain = "" if (os.environ.get("SERVICES_DOMAIN") is None) else "." + os.environ.get("SERVICES_DOMAIN")
-detailsHostname = "details" if (os.environ.get("DETAILS_HOSTNAME") is None) else os.environ.get("DETAILS_HOSTNAME")
-detailsPort = "9080" if (os.environ.get("DETAILS_SERVICE_PORT") is None) else os.environ.get("DETAILS_SERVICE_PORT")
-ratingsHostname = "ratings" if (os.environ.get("RATINGS_HOSTNAME") is None) else os.environ.get("RATINGS_HOSTNAME")
-ratingsPort = "9080" if (os.environ.get("RATINGS_SERVICE_PORT") is None) else os.environ.get("RATINGS_SERVICE_PORT")
-reviewsHostname = "reviews" if (os.environ.get("REVIEWS_HOSTNAME") is None) else os.environ.get("REVIEWS_HOSTNAME")
-reviewsPort = "9080" if (os.environ.get("REVIEWS_SERVICE_PORT") is None) else os.environ.get("REVIEWS_SERVICE_PORT")
+servicesDomain = (
+    "" if (os.environ.get("SERVICES_DOMAIN") is None) else "." + os.environ.get("SERVICES_DOMAIN")
+)
+detailsHostname = (
+    "details"
+    if (os.environ.get("DETAILS_HOSTNAME") is None)
+    else os.environ.get("DETAILS_HOSTNAME")
+)
+detailsPort = (
+    "9080"
+    if (os.environ.get("DETAILS_SERVICE_PORT") is None)
+    else os.environ.get("DETAILS_SERVICE_PORT")
+)
+ratingsHostname = (
+    "ratings"
+    if (os.environ.get("RATINGS_HOSTNAME") is None)
+    else os.environ.get("RATINGS_HOSTNAME")
+)
+ratingsPort = (
+    "9080"
+    if (os.environ.get("RATINGS_SERVICE_PORT") is None)
+    else os.environ.get("RATINGS_SERVICE_PORT")
+)
+reviewsHostname = (
+    "reviews"
+    if (os.environ.get("REVIEWS_HOSTNAME") is None)
+    else os.environ.get("REVIEWS_HOSTNAME")
+)
+reviewsPort = (
+    "9080"
+    if (os.environ.get("REVIEWS_SERVICE_PORT") is None)
+    else os.environ.get("REVIEWS_SERVICE_PORT")
+)
 
-flood_factor = 0 if (os.environ.get("FLOOD_FACTOR") is None) else int(os.environ.get("FLOOD_FACTOR"))
+flood_factor = (
+    0 if (os.environ.get("FLOOD_FACTOR") is None) else int(os.environ.get("FLOOD_FACTOR"))
+)
 
 details = {
     "name": "http://{0}{1}:{2}".format(detailsHostname, servicesDomain, detailsPort),
     "endpoint": "details",
-    "children": []
+    "children": [],
 }
 
 ratings = {
     "name": "http://{0}{1}:{2}".format(ratingsHostname, servicesDomain, ratingsPort),
     "endpoint": "ratings",
-    "children": []
+    "children": [],
 }
 
 reviews = {
     "name": "http://{0}{1}:{2}".format(reviewsHostname, servicesDomain, reviewsPort),
     "endpoint": "reviews",
-    "children": [ratings]
+    "children": [ratings],
 }
 
 productpage = {
     "name": "http://{0}{1}:{2}".format(detailsHostname, servicesDomain, detailsPort),
     "endpoint": "details",
-    "children": [details, reviews]
+    "children": [details, reviews],
 }
 
 service_dict = {
@@ -110,7 +125,9 @@ CLIENT_ID = "productpage-password-grant"
 TOKEN_URL = f"{KEYCLOAK_BASE_URL}/realms/{REALM}/protocol/openid-connect/token"
 USERINFO_URL = f"{KEYCLOAK_BASE_URL}/realms/{REALM}/protocol/openid-connect/userinfo"
 
-request_result_counter = Counter('request_result', 'Results of requests', ['destination_app', 'response_code'])
+request_result_counter = Counter(
+    "request_result", "Results of requests", ["destination_app", "response_code"]
+)
 
 # A note on distributed tracing:
 #
@@ -151,43 +168,37 @@ def getForwardHeaders(request):
     propagator.inject(headers, ctx)
 
     # We handle other (non x-b3-***) headers manually
-    if 'user' in session:
-        headers['end-user'] = session['user']
+    if "user" in session:
+        headers["end-user"] = session["user"]
 
     # Keep this in sync with the headers in details and reviews.
     incoming_headers = [
         # All applications should propagate x-request-id. This header is
         # included in access log statements and is used for consistent trace
         # sampling and log sampling decisions in Istio.
-        'x-request-id',
-
+        "x-request-id",
         # Lightstep tracing header. Propagate this if you use lightstep tracing
         # in Istio (see
         # https://istio.io/latest/docs/tasks/observability/distributed-tracing/lightstep/)
         # Note: this should probably be changed to use B3 or W3C TRACE_CONTEXT.
         # Lightstep recommends using B3 or TRACE_CONTEXT and most application
         # libraries from lightstep do not support x-ot-span-context.
-        'x-ot-span-context',
-
+        "x-ot-span-context",
         # Datadog tracing header. Propagate these headers if you use Datadog
         # tracing.
-        'x-datadog-trace-id',
-        'x-datadog-parent-id',
-        'x-datadog-sampling-priority',
-
+        "x-datadog-trace-id",
+        "x-datadog-parent-id",
+        "x-datadog-sampling-priority",
         # W3C Trace Context. Compatible with OpenCensusAgent and Stackdriver Istio
         # configurations.
-        'traceparent',
-        'tracestate',
-
+        "traceparent",
+        "tracestate",
         # Cloud trace context. Compatible with OpenCensusAgent and Stackdriver Istio
         # configurations.
-        'x-cloud-trace-context',
-
+        "x-cloud-trace-context",
         # Grpc binary trace context. Compatible with OpenCensusAgent nad
         # Stackdriver Istio configurations.
-        'grpc-trace-bin',
-
+        "grpc-trace-bin",
         # b3 trace headers. Compatible with Zipkin, OpenCensusAgent, and
         # Stackdriver Istio configurations.
         # This is handled by opentelemetry above
@@ -196,17 +207,14 @@ def getForwardHeaders(request):
         # 'x-b3-parentspanid',
         # 'x-b3-sampled',
         # 'x-b3-flags',
-
         # SkyWalking trace headers.
-        'sw8',
-
+        "sw8",
         # Application-specific headers to forward.
-        'user-agent',
-
+        "user-agent",
         # Context and session specific headers
-        'cookie',
-        'authorization',
-        'jwt',
+        "cookie",
+        "authorization",
+        "jwt",
     ]
     # For Zipkin, always propagate b3 headers.
     # For Lightstep, always propagate the x-ot-span-context header.
@@ -226,28 +234,30 @@ def getForwardHeaders(request):
 
 
 # The UI:
-@app.route('/')
-@app.route('/index.html')
+@app.route("/")
+@app.route("/index.html")
 def index():
-    """ Display productpage with normal user and test user buttons"""
+    """Display productpage with normal user and test user buttons"""
     global productpage
 
-    table = json2html.convert(json=json.dumps(productpage),
-                              table_attributes="class=\"table table-condensed table-bordered table-hover\"")
+    table = json2html.convert(
+        json=json.dumps(productpage),
+        table_attributes='class="table table-condensed table-bordered table-hover"',
+    )
 
-    return render_template('index.html', serviceTable=table)
+    return render_template("index.html", serviceTable=table)
 
 
-@app.route('/health')
+@app.route("/health")
 def health():
-    return 'Product page is healthy'
+    return "Product page is healthy"
 
 
 # Changed
-@app.route('/login', methods=['POST'])
+@app.route("/login", methods=["POST"])
 def login():
-    user = request.values.get('username')
-    password = request.values.get('passwd')
+    user = request.values.get("username")
+    password = request.values.get("passwd")
     if not user or not password:
         return app.make_response(redirect(request.referrer))
 
@@ -277,13 +287,15 @@ def login():
     session["user"] = userinfo.get("preferred_username") or userinfo.get("email") or user
     return response
 
+
 # Changed
-@app.route('/logout', methods=['GET'])
+@app.route("/logout", methods=["GET"])
 def logout():
     response = app.make_response(redirect(request.referrer))
     session.pop("auth", None)
     session.pop("user", None)
     return response
+
 
 # a helper function for asyncio.gather, does not return a value
 
@@ -291,12 +303,16 @@ def logout():
 async def getProductReviewsIgnoreResponse(product_id, headers):
     getProductReviews(product_id, headers)
 
+
 # flood reviews with unnecessary requests to demonstrate Istio rate limiting, asynchronously
 
 
 async def floodReviewsAsynchronously(product_id, headers):
     # the response is disregarded
-    await asyncio.gather(*(getProductReviewsIgnoreResponse(product_id, headers) for _ in range(flood_factor)))
+    await asyncio.gather(
+        *(getProductReviewsIgnoreResponse(product_id, headers) for _ in range(flood_factor))
+    )
+
 
 # flood reviews with unnecessary requests to demonstrate Istio rate limiting
 
@@ -307,11 +323,11 @@ def floodReviews(product_id, headers):
     loop.close()
 
 
-@app.route('/productpage')
+@app.route("/productpage")
 def front():
     product_id = 0  # TODO: replace default value
     headers = getForwardHeaders(request)
-    user = session.get('user', '')
+    user = session.get("user", "")
     product = getProduct(product_id)
     detailsStatus, details = getProductDetails(product_id, headers)
 
@@ -320,43 +336,44 @@ def front():
 
     reviewsStatus, reviews = getProductReviews(product_id, headers)
     return render_template(
-        'productpage.html',
+        "productpage.html",
         detailsStatus=detailsStatus,
         reviewsStatus=reviewsStatus,
         product=product,
         details=details,
         reviews=reviews,
-        user=user)
+        user=user,
+    )
 
 
 # The API:
-@app.route('/api/v1/products')
+@app.route("/api/v1/products")
 def productsRoute():
-    return json.dumps(getProducts()), 200, {'Content-Type': 'application/json'}
+    return json.dumps(getProducts()), 200, {"Content-Type": "application/json"}
 
 
-@app.route('/api/v1/products/<product_id>')
+@app.route("/api/v1/products/<product_id>")
 def productRoute(product_id):
     headers = getForwardHeaders(request)
     status, details = getProductDetails(product_id, headers)
-    return json.dumps(details), status, {'Content-Type': 'application/json'}
+    return json.dumps(details), status, {"Content-Type": "application/json"}
 
 
-@app.route('/api/v1/products/<product_id>/reviews')
+@app.route("/api/v1/products/<product_id>/reviews")
 def reviewsRoute(product_id):
     headers = getForwardHeaders(request)
     status, reviews = getProductReviews(product_id, headers)
-    return json.dumps(reviews), status, {'Content-Type': 'application/json'}
+    return json.dumps(reviews), status, {"Content-Type": "application/json"}
 
 
-@app.route('/api/v1/products/<product_id>/ratings')
+@app.route("/api/v1/products/<product_id>/ratings")
 def ratingsRoute(product_id):
     headers = getForwardHeaders(request)
     status, ratings = getProductRatings(product_id, headers)
-    return json.dumps(ratings), status, {'Content-Type': 'application/json'}
+    return json.dumps(ratings), status, {"Content-Type": "application/json"}
 
 
-@app.route('/metrics')
+@app.route("/metrics")
 def metrics():
     return generate_latest()
 
@@ -365,9 +382,9 @@ def metrics():
 def getProducts():
     return [
         {
-            'id': 0,
-            'title': 'The Comedy of Errors',
-            'descriptionHtml': '<a href="https://en.wikipedia.org/wiki/The_Comedy_of_Errors">Wikipedia Summary</a>: The Comedy of Errors is one of <b>William Shakespeare\'s</b> early plays. It is his shortest and one of his most farcical comedies, with a major part of the humour coming from slapstick and mistaken identity, in addition to puns and word play.'
+            "id": 0,
+            "title": "The Comedy of Errors",
+            "descriptionHtml": '<a href="https://en.wikipedia.org/wiki/The_Comedy_of_Errors">Wikipedia Summary</a>: The Comedy of Errors is one of <b>William Shakespeare\'s</b> early plays. It is his shortest and one of his most farcical comedies, with a major part of the humour coming from slapstick and mistaken identity, in addition to puns and word play.',
         }
     ]
 
@@ -382,17 +399,17 @@ def getProduct(product_id):
 
 def getProductDetails(product_id, headers):
     try:
-        url = details['name'] + "/" + details['endpoint'] + "/" + str(product_id)
+        url = details["name"] + "/" + details["endpoint"] + "/" + str(product_id)
         res = send_request(url, headers=headers, timeout=3.0)
     except BaseException:
         res = None
     if res and res.status_code == 200:
-        request_result_counter.labels(destination_app='details', response_code=200).inc()
+        request_result_counter.labels(destination_app="details", response_code=200).inc()
         return 200, res.json()
     else:
         status = res.status_code if res is not None and res.status_code else 500
-        request_result_counter.labels(destination_app='details', response_code=status).inc()
-        return status, {'error': 'Sorry, product details are currently unavailable for this book.'}
+        request_result_counter.labels(destination_app="details", response_code=status).inc()
+        return status, {"error": "Sorry, product details are currently unavailable for this book."}
 
 
 def getProductReviews(product_id, headers):
@@ -400,31 +417,31 @@ def getProductReviews(product_id, headers):
     # TODO: Figure out how to achieve the same effect using Envoy retries/timeouts
     for _ in range(2):
         try:
-            url = reviews['name'] + "/" + reviews['endpoint'] + "/" + str(product_id)
+            url = reviews["name"] + "/" + reviews["endpoint"] + "/" + str(product_id)
             res = send_request(url, headers=headers, timeout=3.0)
         except BaseException:
             res = None
         if res and res.status_code == 200:
-            request_result_counter.labels(destination_app='reviews', response_code=200).inc()
+            request_result_counter.labels(destination_app="reviews", response_code=200).inc()
             return 200, res.json()
     status = res.status_code if res is not None and res.status_code else 500
-    request_result_counter.labels(destination_app='reviews', response_code=status).inc()
-    return status, {'error': 'Sorry, product reviews are currently unavailable for this book.'}
+    request_result_counter.labels(destination_app="reviews", response_code=status).inc()
+    return status, {"error": "Sorry, product reviews are currently unavailable for this book."}
 
 
 def getProductRatings(product_id, headers):
     try:
-        url = ratings['name'] + "/" + ratings['endpoint'] + "/" + str(product_id)
+        url = ratings["name"] + "/" + ratings["endpoint"] + "/" + str(product_id)
         res = send_request(url, headers=headers, timeout=3.0)
     except BaseException:
         res = None
     if res and res.status_code == 200:
-        request_result_counter.labels(destination_app='ratings', response_code=200).inc()
+        request_result_counter.labels(destination_app="ratings", response_code=200).inc()
         return 200, res.json()
     else:
         status = res.status_code if res is not None and res.status_code else 500
-        request_result_counter.labels(destination_app='ratings', response_code=status).inc()
-        return status, {'error': 'Sorry, product ratings are currently unavailable for this book.'}
+        request_result_counter.labels(destination_app="ratings", response_code=status).inc()
+        return status, {"error": "Sorry, product ratings are currently unavailable for this book."}
 
 
 # Changed
@@ -432,7 +449,7 @@ def _get_access_token_if_any():
     auth = session.get("auth")
     if not auth:
         return None
-    token = auth.get("token",{})
+    token = auth.get("token", {})
     access_token = token.get("access_token")
     expires_at = int(token.get("expires_at", 0))
     if access_token and int(time.time()) < expires_at - 30:
@@ -472,7 +489,7 @@ def send_request(url, **kwargs):
 
 class Writer(object):
     def __init__(self, filename):
-        self.file = open(filename, 'w')
+        self.file = open(filename, "w")
 
     def write(self, data):
         self.file.write(data)
@@ -481,7 +498,7 @@ class Writer(object):
         self.file.flush()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 2:
         logging.error("usage: %s port" % (sys.argv[0]))
         sys.exit(-1)
@@ -490,6 +507,6 @@ if __name__ == '__main__':
     logging.info("start at port %s" % (p))
     # Make it compatible with IPv6 if Linux
     if sys.platform == "linux":
-        app.run(host='::', port=p, debug=False, threaded=True)
+        app.run(host="::", port=p, debug=False, threaded=True)
     else:
-        app.run(host='0.0.0.0', port=p, debug=False, threaded=True)
+        app.run(host="0.0.0.0", port=p, debug=False, threaded=True)
