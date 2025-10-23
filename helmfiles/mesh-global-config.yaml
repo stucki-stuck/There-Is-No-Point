@@ -10,7 +10,16 @@ releases:
     createNamespace: true
     chart: ../charts/cluster/istio-config
 
-  - name: istio-ingress
+  - name: istio-ingress-main-gateway
     namespace: istio-ingress
     createNamespace: true
     chart: ../charts/cluster/istio-ingress
+    values:
+      - ./values/mesh-global-config/istio-ingress/main-gateway.yaml
+
+  - name: istio-ingress-jwt-authentication-gateway
+    namespace: istio-ingress
+    createNamespace: true
+    chart: ../charts/cluster/istio-ingress
+    values:
+      - ./values/mesh-global-config/istio-ingress/jwt-authentication-gateway.yaml

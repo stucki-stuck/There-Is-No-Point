@@ -11,6 +11,6 @@ apps:
     servicePort: 8000
 
 gateway:
-  name: main-gateway
+  name: jwt-authentication-gateway
   namespace: istio-ingress
   hostname: "httpbin.there-is-no-point.localhost"

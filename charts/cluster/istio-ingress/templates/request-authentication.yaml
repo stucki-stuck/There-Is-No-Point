@@ -5,14 +5,14 @@
 apiVersion: security.istio.io/v1
 kind: RequestAuthentication
 metadata:
-  name: jwt-rule
+  name: {{ include "istio-ingress.gateway-name" . }}-jwt-rule
   labels:
     {{- include "istio-ingress.labels" . | nindent 4 }}
 spec:
   targetRef:
     kind: Gateway
     group: gateway.networking.k8s.io
-    name: main-gateway
+    name: {{ include "istio-ingress.gateway-name" . }}
   {{- with .Values.jwtRules }}
   jwtRules:
     {{- toYaml . | nindent 4 }}

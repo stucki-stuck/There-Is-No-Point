@@ -1,0 +1,5 @@
+---
+hostnameGlob: "*.there-is-no-point.localhost"
+deployment:
+  labels:
+    gateway-options-deployment: set-by-istio-ingress

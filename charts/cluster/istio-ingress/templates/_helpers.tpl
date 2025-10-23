@@ -1,4 +1,17 @@
 {{/*
+Generate gateway name from release name
+*/}}
+{{- define "istio-ingress.gateway-name" -}}
+{{- $prefix := printf "%s-" .Chart.Name }}
+{{- if hasPrefix $prefix .Release.Name }}
+{{- .Release.Name | trimPrefix $prefix | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+
+
+{{/*
 Expand the name of the chart.
 */}}
 {{- define "istio-ingress.name" -}}

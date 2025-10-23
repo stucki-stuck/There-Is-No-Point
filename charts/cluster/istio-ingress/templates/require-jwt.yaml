@@ -3,14 +3,14 @@
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: require-jwt
+  name: {{ include "istio-ingress.gateway-name" . }}-require-jwt
   labels:
     {{- include "istio-ingress.labels" . | nindent 4 }}
 spec:
   targetRef:
     kind: Gateway
     group: gateway.networking.k8s.io
-    name: main-gateway
+    name: {{ include "istio-ingress.gateway-name" . }}
   action: DENY
   rules:
     - from:
@@ -21,5 +21,6 @@ spec:
             hosts:
             {{- range .Values.requireJwtHostname }}
               - {{ . | quote }}
+              - {{ printf "%s:*" . | quote }}
             {{- end }}
 {{- end }}

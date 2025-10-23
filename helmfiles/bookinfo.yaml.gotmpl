@@ -26,8 +26,8 @@ releases:
           - "label"
           - "namespace"
           - "{{`{{.Release.Namespace}}`}}"
-          - "istio.io/gateway-access=true"
           - "istio.io/dataplane-mode=ambient"
+          - "istio.io/main-gateway-access=true"
           - "--overwrite"
     values:
       - ./values/meshes/bookinfo/product-page.yaml

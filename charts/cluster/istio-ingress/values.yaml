@@ -5,5 +5,16 @@ hpa:
   minReplicas: 1
   maxReplicas: 3
 deployment:
-  labels:
-    gateway-options-deployment: set-by-istio-ingress
+  labels: {}
+# The k3d load balancers are not 100% supported.
+# If two load balancers expose the same ports, one of them cannot start.
+# I therefore chose to change the port for each load balancer,
+# and disable the status port for Istio (listening on port 15021).
+port: 80
+service:
+  spec:
+    ports:
+      - "$patch": delete
+        port: 15021
+jwtRules: []
+requireJwtHostname: []

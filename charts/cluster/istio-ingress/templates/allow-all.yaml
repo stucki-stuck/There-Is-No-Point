@@ -2,10 +2,14 @@
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: {{ include "istio-ingress.gateway-name" . }}-allow-all
   labels:
     {{- include "istio-ingress.labels" . | nindent 4 }}
 spec:
   action: ALLOW
   rules:
-  - {}
+    - {}
+  targetRefs:
+  - name: {{ include "istio-ingress.gateway-name" . }}
+    kind: Gateway
+    group: gateway.networking.k8s.io

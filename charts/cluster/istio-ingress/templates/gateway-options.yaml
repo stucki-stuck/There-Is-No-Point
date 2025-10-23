@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gateway-options
+  name: {{ include "istio-ingress.gateway-name" . }}-options
   labels:
     {{- include "istio-ingress.labels" . | nindent 4 }}
 data:
@@ -17,4 +17,8 @@ data:
     metadata:
       labels:
         {{- toYaml . | nindent 8 }}
+  {{- end }}
+  {{- with .Values.service }}
+  service: |
+    {{- toYaml . | nindent 4 }}
   {{- end }}
