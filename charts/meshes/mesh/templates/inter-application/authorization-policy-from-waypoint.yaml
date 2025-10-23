@@ -9,7 +9,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/instance-group: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
+      app: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
   action: ALLOW
   rules:
     - from:

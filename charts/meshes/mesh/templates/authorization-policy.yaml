@@ -15,7 +15,7 @@ spec:
   {{- else }}
   selector:
     matchLabels:
-      app.kubernetes.io/instance: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
+      app: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
   {{- end }}
   action: ALLOW
   {{- with .Values.authorization.rules }}

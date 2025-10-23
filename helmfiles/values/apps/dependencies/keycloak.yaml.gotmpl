@@ -3,6 +3,8 @@ global:
   security:
     allowInsecureImages: true
 
+commonLabels:
+  app: {{ .Release.Name }}
 image:
   registry: public.ecr.aws
   repository: bitnami/keycloak

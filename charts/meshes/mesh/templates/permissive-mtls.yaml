@@ -11,5 +11,5 @@ spec:
     mode: PERMISSIVE
   selector:
     matchLabels:
-      app.kubernetes.io/instance: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
+      app: {{ include "mesh.toAppName" (include "mesh.fullname" .) }}
 {{- end }}

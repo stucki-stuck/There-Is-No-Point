@@ -43,7 +43,7 @@ Selector labels
 {{- define "app.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "app.name" . }}
 app.kubernetes.io/instance: {{ include "app.fullname" . }}
-app.kubernetes.io/instance-group: {{ regexReplaceAll (printf "(-%s).*" .Chart.Name) (include "app.fullname" .) "${1}" -}}
+app: {{ regexReplaceAll (printf "(-%s).*" .Chart.Name) (include "app.fullname" .) "${1}" }}
 {{- end }}
 
 {{/*

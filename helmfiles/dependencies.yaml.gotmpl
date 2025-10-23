@@ -38,7 +38,7 @@ releases:
       domain: dependencies
       phase: install
     values:
-      - ./values/apps/dependencies/keycloak-postgresql.yaml
+      - ./values/apps/dependencies/keycloak-postgresql.yaml.gotmpl
 
   - name: keycloak-mesh
     chart: ../charts/meshes/mesh
