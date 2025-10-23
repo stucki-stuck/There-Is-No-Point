@@ -66,3 +66,17 @@ expect_pod_status() { # usage: expect_pod_status <expected> <ns> <pod> <curl-arg
     exit 1
   fi
 }
+
+login_and_store_cookies() { # usage: login_and_store_cookies <tmp-dir> <login-url> <user> <pass>
+  local tmp_dir="$1" login_url="$2" user="$3" pass="$4"
+
+  info "Authenticating as '$user' and storing cookies in $tmp_dir"
+
+  expect_status 302 \
+    -X POST "$login_url" \
+    -H 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode "username=$user" \
+    --data-urlencode "passwd=$pass" \
+    -c "$tmp_dir/cookies.txt"
+
+}
