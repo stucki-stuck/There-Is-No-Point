@@ -1,8 +1,6 @@
 ---
 networking:
   addAWaypoint: true
-  waypointService:
-    port: 8080
 
 authorization:
   addAuthorizations: true

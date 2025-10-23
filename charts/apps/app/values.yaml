@@ -5,9 +5,10 @@ image:
   pullPolicy: IfNotPresent
   tag: ""
 imagePullSecrets: []
+containerPort: 8000
 service:
   type: ClusterIP
-  port: ""
+  port: 8000
 serviceAccount:
   create: true
   automount: true

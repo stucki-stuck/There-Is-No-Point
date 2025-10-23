@@ -10,7 +10,8 @@ networking:
 
   addAWaypoint: false
   waypointService:
-    port: ""
+    targetPort: http
+    port: 8000
 
   rules: []
 

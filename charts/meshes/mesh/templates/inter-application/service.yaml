@@ -9,6 +9,6 @@ metadata:
 spec:
   ports:
     - name: http
-      targetPort: {{ .Values.networking.waypointService.port }}
+      targetPort: {{ .Values.networking.waypointService.targetPort }}
       port: {{ .Values.networking.waypointService.port }}
 {{- end }}

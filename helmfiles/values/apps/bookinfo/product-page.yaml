@@ -3,8 +3,7 @@ image:
   #repository: istio/examples-bookinfo-productpage-v1
   repository: registry.localhost:5000/istio/examples-bookinfo-productpage-v1
   tag: "1.20.3"
-service:
-  port: 9080
+containerPort: 9080
 
 podSecurityContext:
   fsGroup: 2000
@@ -32,5 +31,9 @@ volumeMounts:
 env:
   - name: REVIEWS_HOSTNAME
     value: "reviews-mesh.reviews"
+  - name: REVIEWS_SERVICE_PORT
+    value: "8000"
   - name: DETAILS_HOSTNAME
     value: "details-mesh.details"
+  - name: DETAILS_SERVICE_PORT
+    value: "8000"

@@ -2,8 +2,8 @@
 set -euo pipefail
 source "$(dirname "$0")/../lib/utils.sh"
 
-GET_URL="http://httpbingo-mesh.m2m-httpbin:8080/get"
-HEADERS_URL="http://httpbingo-mesh.m2m-httpbin:8080/headers"
+GET_URL="http://httpbingo-mesh.m2m-httpbin:8000/get"
+HEADERS_URL="http://httpbingo-mesh.m2m-httpbin:8000/headers"
 TOKEN="$(curl -s https://raw.githubusercontent.com/istio/istio/release-1.27/security/tools/jwt/samples/demo.jwt)"
 TOKEN_GROUP="$(curl -s https://raw.githubusercontent.com/istio/istio/release-1.27/security/tools/jwt/samples/groups-scope.jwt)"
 CURL_POD="$(find_pod_by_label "m2m-httpbin" "app.kubernetes.io/instance=curl-app")"

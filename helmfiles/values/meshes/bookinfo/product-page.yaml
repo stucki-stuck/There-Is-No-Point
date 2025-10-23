@@ -24,7 +24,7 @@ networking:
             value: /api/v1/products
       backendRefs:
         - name: product-page-app
-          port: 9080
+          port: 8000
 
 authorization:
   addAuthorizations: true
