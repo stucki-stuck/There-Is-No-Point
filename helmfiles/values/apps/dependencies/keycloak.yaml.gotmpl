@@ -16,6 +16,9 @@ logging:
   level: INFO
 networkPolicy:
   enabled: false
+service:
+  ports:
+    http: 8000
 livenessProbe:
   initialDelaySeconds: 200
 resources:

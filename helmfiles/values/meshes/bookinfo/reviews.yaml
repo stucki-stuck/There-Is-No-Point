@@ -17,8 +17,8 @@ networking:
 authorization:
   addAuthorizations: true
   jwtRules:
-    - issuer: "http://keycloak-app.keycloak/realms/there-is-no-point"
-      jwksUri: "http://keycloak-app.keycloak.svc.cluster.local/realms/there-is-no-point/protocol/openid-connect/certs"
+    - issuer: "http://keycloak-app.keycloak:8000/realms/there-is-no-point"
+      jwksUri: "http://keycloak-app.keycloak.svc.cluster.local:8000/realms/there-is-no-point/protocol/openid-connect/certs"
   rules:
     - from:
         - source:

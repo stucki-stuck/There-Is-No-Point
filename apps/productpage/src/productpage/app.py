@@ -119,7 +119,7 @@ service_dict = {
 }
 
 # Changed
-KEYCLOAK_BASE_URL = "http://keycloak-app.keycloak"
+KEYCLOAK_BASE_URL = "http://keycloak-app.keycloak:8000"
 REALM = "there-is-no-point"
 CLIENT_ID = "productpage-password-grant"
 TOKEN_URL = f"{KEYCLOAK_BASE_URL}/realms/{REALM}/protocol/openid-connect/token"

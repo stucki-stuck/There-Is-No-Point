@@ -12,7 +12,7 @@ networking:
   rules:
     - backendRefs:
         - name: keycloak-app
-          port: 80
+          port: 8000
 
 authorization:
   addAuthorizations: true
