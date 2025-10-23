@@ -37,6 +37,7 @@ repos:
           - "100"
         additional_dependencies:
           - mdformat-gfm
+          - mdformat-toc
   - repo: https://github.com/google/yamlfmt
     rev: v0.17.2
     hooks:

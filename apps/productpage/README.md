@@ -3,6 +3,17 @@
 Project stolen from Istio samples :
 [productpage](https://github.com/istio/istio/tree/master/samples/bookinfo/src/productpage)
 
+**Table of Contents**
+
+<!-- mdformat-toc start --slug=github --no-anchors --maxlevel=6 --minlevel=2 -->
+
+- [Change made](#change-made)
+  - [`DevOps`](#devops)
+  - [`Python`](#python)
+    - [TODO](#todo)
+
+<!-- mdformat-toc end -->
+
 ## Change made
 
 ### `DevOps`
