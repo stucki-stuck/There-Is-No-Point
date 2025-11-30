@@ -36,6 +36,7 @@ repos:
           - --wrap
           - "100"
         additional_dependencies:
+          - mdformat-gfm-alerts
           - mdformat-gfm
           - mdformat-toc
   - repo: https://github.com/google/yamlfmt

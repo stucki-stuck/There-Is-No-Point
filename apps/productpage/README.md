@@ -1,3 +1,10 @@
+> [!CAUTION]
+> Few changes have been made to the original application. I'm not used to working with `Flask`. I
+> usually develop with `FastAPI`, but I didn't want to completely recode the application, so I kept
+> the original structure.<br> This introduction is just there to explain that, this code does not
+> reflect my skills as a Python developer. 🙃<br> Changes I have made are marked with `# Changed` in
+> [app.py](src/productpage/app.py):
+
 # Product page
 
 Project stolen from Istio samples :
