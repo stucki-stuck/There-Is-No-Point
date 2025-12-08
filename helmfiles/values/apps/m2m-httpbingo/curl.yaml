@@ -1,7 +1,7 @@
 ---
 image:
   repository: curlimages/curl
-  tag: "8.16.0"
+  tag: "8.17.0"
 containerPort: 80
 command:
   - "/bin/sleep"

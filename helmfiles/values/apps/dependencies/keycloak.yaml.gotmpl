@@ -8,7 +8,7 @@ commonLabels:
 image:
   registry: public.ecr.aws
   repository: bitnami/keycloak
-  tag: 26.3.4-debian-12-r1
+  tag: "26.4.7"
 auth:
   adminUser: admin
   adminPassword: supersecret
@@ -45,7 +45,7 @@ keycloakConfigCli:
   image:
     registry: public.ecr.aws
     repository: bitnami/keycloak-config-cli
-    tag: 6.4.0-debian-12-r13
+    tag: "6.4.0"
   configuration:
   {{- range $_, $path := readDir "./keycloak-config-cli-files" }}
     {{ base $path }}: |-

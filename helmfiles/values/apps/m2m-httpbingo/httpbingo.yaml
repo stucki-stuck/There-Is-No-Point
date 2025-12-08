@@ -1,5 +1,5 @@
 ---
 image:
   repository: mccutchen/go-httpbin
-  tag: "2.18"
+  tag: "2.19"
 containerPort: 8080
