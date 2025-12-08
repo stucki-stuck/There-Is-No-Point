@@ -8,7 +8,7 @@ metadata:
   name: no-point
 servers: 1
 agents: 2
-image: rancher/k3s:v1.33.2-rc2-k3s1
+image: rancher/k3s:v1.34.2-k3s1
 registries:
   create:
     name: registry.localhost
