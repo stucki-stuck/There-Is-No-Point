@@ -85,7 +85,7 @@ Require valid jwt to access the application:
 
 ```bash
 TOKEN=$(curl https://raw.githubusercontent.com/istio/istio/release-1.27/security/tools/jwt/samples/demo.jwt -s)
-curl -H "Authorization: Bearer $TOKEN" http://httpbin.there-is-no-point.localhost/get
+curl -H "Authorization: Bearer $TOKEN" http://httpbin.there-is-no-point.localhost:8080/get
 ```
 
 #### m2m-httpbingo: service-to-service communication tests

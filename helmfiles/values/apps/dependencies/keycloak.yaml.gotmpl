@@ -6,9 +6,8 @@ global:
 commonLabels:
   app: {{ .Release.Name }}
 image:
-  registry: public.ecr.aws
-  repository: bitnami/keycloak
-  tag: 26.3.4-debian-12-r1
+  repository: bitnamilegacy/keycloak
+  tag: 26.3.3-debian-12-r0
 auth:
   adminUser: admin
   adminPassword: supersecret
@@ -43,9 +42,8 @@ externalDatabase:
 keycloakConfigCli:
   enabled: true
   image:
-    registry: public.ecr.aws
-    repository: bitnami/keycloak-config-cli
-    tag: 6.4.0-debian-12-r13
+    repository: bitnamilegacy/keycloak-config-cli
+    tag: 6.4.0-debian-12-r11
   configuration:
   {{- range $_, $path := readDir "./keycloak-config-cli-files" }}
     {{ base $path }}: |-
