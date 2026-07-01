@@ -1,5 +1,5 @@
-# Ref: https://istio.io/latest/docs/ambient/install/helm/
 ---
+# Ref: https://istio.io/latest/docs/ambient/install/helm/
 commonLabels:
   domain: mesh
   phase: install
@@ -13,7 +13,7 @@ releases:
     namespace: istio-system
     createNamespace: true
     chart: istio/base
-    version: ~1.26.0
+    version: ~1.30.0
     wait: true
     hooks:
       - events:
@@ -23,13 +23,13 @@ releases:
         args:
           - "apply"
           - "-f"
-          - "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml"
+          - "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.0/standard-install.yaml"
 
   - name: istiod
     namespace: istio-system
     createNamespace: true
     chart: istio/istiod
-    version: ~1.26.0
+    version: ~1.30.0
     wait: true
     needs:
       - istio-base
@@ -40,7 +40,7 @@ releases:
     namespace: istio-system
     createNamespace: true
     chart: istio/cni
-    version: ~1.26.0
+    version: ~1.30.0
     wait: true
     needs:
       - istiod
@@ -51,7 +51,7 @@ releases:
     namespace: istio-system
     createNamespace: true
     chart: istio/ztunnel
-    version: ~1.26.0
+    version: ~1.30.0
     wait: true
     needs:
       - istio-cni
