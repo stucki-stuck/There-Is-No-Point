@@ -46,7 +46,7 @@ Changes I have made are marked with `# Changed` in [app.py](src/productpage/app.
 
 #### TODO
 
-- [ ] Add [`Pydantic BaseSettings`](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
+- [x] Add [`Pydantic BaseSettings`](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
   for application configuration and environment variables.
 - [ ] Add [`Ruff`](https://docs.astral.sh/ruff/), for linting and formatting
   - [x] Formatting

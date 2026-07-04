@@ -1,33 +1,12 @@
-#!/usr/bin/python
-#
-# Copyright Istio Authors
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
-# These two lines enable debugging at httplib level (requests->urllib3->http.client)
-# You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
-# The only thing missing will be the response.body which is not logged.
 import asyncio
 import http.client as http_client
 import logging
-import os
 import sys
 import time
-
 import httpx
 import requests
 import simplejson as json
-from flask import Flask, g, make_response, redirect, render_template, request, session
+from flask import Flask, redirect, render_template, request, session
 from json2html import json2html
 from opentelemetry import trace
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -35,6 +14,7 @@ from opentelemetry.propagate import set_global_textmap
 from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.sdk.trace import TracerProvider
 from prometheus_client import Counter, generate_latest
+from productpage.settings import settings
 
 http_client.HTTPConnection.debuglevel = 0
 
@@ -46,84 +26,7 @@ requests_log.setLevel(logging.INFO)
 requests_log.propagate = True
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.INFO)
-
-# Set the secret key to some random bytes. Keep this really secret!
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-
-servicesDomain = (
-    "" if (os.environ.get("SERVICES_DOMAIN") is None) else "." + os.environ.get("SERVICES_DOMAIN")
-)
-detailsHostname = (
-    "details"
-    if (os.environ.get("DETAILS_HOSTNAME") is None)
-    else os.environ.get("DETAILS_HOSTNAME")
-)
-detailsPort = (
-    "9080"
-    if (os.environ.get("DETAILS_SERVICE_PORT") is None)
-    else os.environ.get("DETAILS_SERVICE_PORT")
-)
-ratingsHostname = (
-    "ratings"
-    if (os.environ.get("RATINGS_HOSTNAME") is None)
-    else os.environ.get("RATINGS_HOSTNAME")
-)
-ratingsPort = (
-    "9080"
-    if (os.environ.get("RATINGS_SERVICE_PORT") is None)
-    else os.environ.get("RATINGS_SERVICE_PORT")
-)
-reviewsHostname = (
-    "reviews"
-    if (os.environ.get("REVIEWS_HOSTNAME") is None)
-    else os.environ.get("REVIEWS_HOSTNAME")
-)
-reviewsPort = (
-    "9080"
-    if (os.environ.get("REVIEWS_SERVICE_PORT") is None)
-    else os.environ.get("REVIEWS_SERVICE_PORT")
-)
-
-flood_factor = (
-    0 if (os.environ.get("FLOOD_FACTOR") is None) else int(os.environ.get("FLOOD_FACTOR"))
-)
-
-details = {
-    "name": "http://{0}{1}:{2}".format(detailsHostname, servicesDomain, detailsPort),
-    "endpoint": "details",
-    "children": [],
-}
-
-ratings = {
-    "name": "http://{0}{1}:{2}".format(ratingsHostname, servicesDomain, ratingsPort),
-    "endpoint": "ratings",
-    "children": [],
-}
-
-reviews = {
-    "name": "http://{0}{1}:{2}".format(reviewsHostname, servicesDomain, reviewsPort),
-    "endpoint": "reviews",
-    "children": [ratings],
-}
-
-productpage = {
-    "name": "http://{0}{1}:{2}".format(detailsHostname, servicesDomain, detailsPort),
-    "endpoint": "details",
-    "children": [details, reviews],
-}
-
-service_dict = {
-    "productpage": productpage,
-    "details": details,
-    "reviews": reviews,
-}
-
-# Changed
-KEYCLOAK_BASE_URL = "http://keycloak-app.keycloak:8000"
-REALM = "there-is-no-point"
-CLIENT_ID = "productpage-password-grant"
-TOKEN_URL = f"{KEYCLOAK_BASE_URL}/realms/{REALM}/protocol/openid-connect/token"
-USERINFO_URL = f"{KEYCLOAK_BASE_URL}/realms/{REALM}/protocol/openid-connect/userinfo"
+app.secret_key = settings.app_secret_key
 
 request_result_counter = Counter(
     "request_result", "Results of requests", ["destination_app", "response_code"]
@@ -238,10 +141,31 @@ def getForwardHeaders(request):
 @app.route("/index.html")
 def index():
     """Display productpage with normal user and test user buttons"""
-    global productpage
-
     table = json2html.convert(
-        json=json.dumps(productpage),
+        json=json.dumps(
+            {
+                "name": f"http://{settings.details_hostname}:{settings.details_service_port}",
+                "endpoint": settings.details_endpoint,
+                "children": [
+                    {
+                        "name": f"http://{settings.details_hostname}:{settings.details_service_port}",
+                        "endpoint": settings.details_endpoint,
+                        "children": [],
+                    },
+                    {
+                        "name": f"http://{settings.reviews_hostname}:{settings.reviews_service_port}",
+                        "endpoint": settings.reviews_endpoint,
+                        "children": [
+                            {
+                                "name": f"http://{settings.ratings_hostname}:{settings.ratings_service_port}",
+                                "endpoint": settings.ratings_endpoint,
+                                "children": [],
+                            },
+                        ],
+                    },
+                ],
+            }
+        ),
         table_attributes='class="table table-condensed table-bordered table-hover"',
     )
 
@@ -263,18 +187,18 @@ def login():
 
     data = {
         "grant_type": "password",
-        "client_id": CLIENT_ID,
+        "client_id": settings.keycloak_client_id,
         "username": user,
         "password": password,
         "scope": "openid profile email",
     }
     try:
         with httpx.Client(timeout=10) as client:
-            token_response = client.post(TOKEN_URL, data=data)
+            token_response = client.post(settings.token_url, data=data)
             token_response.raise_for_status()
             token = token_response.json()
             userinfo_response = client.get(
-                USERINFO_URL,
+                settings.userinfo_url,
                 headers={"Authorization": f"Bearer {token['access_token']}"},
             )
             userinfo_response.raise_for_status()
@@ -310,7 +234,10 @@ async def getProductReviewsIgnoreResponse(product_id, headers):
 async def floodReviewsAsynchronously(product_id, headers):
     # the response is disregarded
     await asyncio.gather(
-        *(getProductReviewsIgnoreResponse(product_id, headers) for _ in range(flood_factor))
+        *(
+            getProductReviewsIgnoreResponse(product_id, headers)
+            for _ in range(settings.flood_factor)
+        )
     )
 
 
@@ -331,7 +258,7 @@ def front():
     product = getProduct(product_id)
     detailsStatus, details = getProductDetails(product_id, headers)
 
-    if flood_factor > 0:
+    if settings.flood_factor > 0:
         floodReviews(product_id, headers)
 
     reviewsStatus, reviews = getProductReviews(product_id, headers)
@@ -399,7 +326,7 @@ def getProduct(product_id):
 
 def getProductDetails(product_id, headers):
     try:
-        url = details["name"] + "/" + details["endpoint"] + "/" + str(product_id)
+        url = f"http://{settings.details_hostname}:{settings.details_service_port}/{settings.details_endpoint}/{product_id}"
         res = send_request(url, headers=headers, timeout=3.0)
     except BaseException:
         res = None
@@ -417,7 +344,7 @@ def getProductReviews(product_id, headers):
     # TODO: Figure out how to achieve the same effect using Envoy retries/timeouts
     for _ in range(2):
         try:
-            url = reviews["name"] + "/" + reviews["endpoint"] + "/" + str(product_id)
+            url = f"http://{settings.reviews_hostname}:{settings.reviews_service_port}/{settings.reviews_endpoint}/{product_id}"
             res = send_request(url, headers=headers, timeout=3.0)
         except BaseException:
             res = None
@@ -431,7 +358,7 @@ def getProductReviews(product_id, headers):
 
 def getProductRatings(product_id, headers):
     try:
-        url = ratings["name"] + "/" + ratings["endpoint"] + "/" + str(product_id)
+        url = f"http://{settings.ratings_hostname}:{settings.ratings_service_port}/{settings.ratings_endpoint}/{product_id}"
         res = send_request(url, headers=headers, timeout=3.0)
     except BaseException:
         res = None
@@ -462,11 +389,11 @@ def _get_access_token_if_any():
     data = {
         "grant_type": "refresh_token",
         "refresh_token": refresh_token,
-        "client_id": CLIENT_ID,
+        "client_id": settings.keycloak_client_id,
     }
     try:
         with httpx.Client(timeout=10) as client:
-            response = client.post(TOKEN_URL, data=data)
+            response = client.post(settings.token_url, data=data)
             response.raise_for_status()
             new_token = response.json()
     except Exception:
@@ -505,8 +432,4 @@ if __name__ == "__main__":
 
     p = int(sys.argv[1])
     logging.info("start at port %s" % (p))
-    # Make it compatible with IPv6 if Linux
-    if sys.platform == "linux":
-        app.run(host="::", port=p, debug=False, threaded=True)
-    else:
-        app.run(host="0.0.0.0", port=p, debug=False, threaded=True)
+    app.run(host="0.0.0.0", port=p, debug=False, threaded=True)

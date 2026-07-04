@@ -37,3 +37,5 @@ env:
     value: "details-mesh.details"
   - name: DETAILS_SERVICE_PORT
     value: "8000"
+  - name: APP_SECRET_KEY
+    value: supersecret

@@ -25,6 +25,7 @@ dependencies = [
     "opentelemetry-semantic-conventions==0.53b1",
     "opentelemetry-util-http==0.53b1",
     "prometheus-client==0.21.1",
+    "pydantic-settings>=2.14.2",
     "requests==2.32.3",
     "setuptools==78.1.0",
     "simplejson==3.20.1",
