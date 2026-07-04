@@ -63,6 +63,12 @@ trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
 
+def _set_token_expires_at(token):
+    expires_in = token.get("expires_in")
+    if expires_in is None:
+        return
+    token["expires_at"] = int(time.time()) + int(expires_in)
+
 def getForwardHeaders(request):
     headers = {}
 
@@ -197,6 +203,7 @@ def login():
             token_response = client.post(settings.token_url, data=data)
             token_response.raise_for_status()
             token = token_response.json()
+            _set_token_expires_at(token)
             userinfo_response = client.get(
                 settings.userinfo_url,
                 headers={"Authorization": f"Bearer {token['access_token']}"},
@@ -400,6 +407,7 @@ def _get_access_token_if_any():
         session.pop("auth", None)
         session.pop("user", None)
         return None
+    _set_token_expires_at(new_token)
     auth["token"].update(new_token)
     session["auth"] = auth
     return new_token.get("access_token")
