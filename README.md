@@ -135,10 +135,10 @@ helmfile sync
 ### Useful bash scripts!
 
 ```bash
-# Launch cluster and run tests
+# Launch cluster, deploy the stack and run tests
 ./scripts/run.sh
 
-# Launch cluster (equivalent to the above instructions)
+# Launch cluster and deploy the stack
 ./scripts/cluster/cluster.sh
 
 # delete cluster
