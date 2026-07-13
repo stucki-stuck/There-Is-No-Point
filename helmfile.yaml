@@ -1,8 +1,12 @@
 ---
 helmfiles:
+  # Istio setup
   - path: helmfiles/mesh-base.yaml
   - path: helmfiles/mesh-global-config.yaml
+  # httpbingo: testing Access to the Platform
   - path: helmfiles/httpbingo.yaml.gotmpl
+  # m2m-httpbingo: service-to-service communication tests
   - path: helmfiles/m2m-httpbingo.yaml.gotmpl
+  # Istio bookinfo application
   - path: helmfiles/dependencies.yaml.gotmpl
   - path: helmfiles/bookinfo.yaml.gotmpl

@@ -1,19 +1,16 @@
 ---
-global:
-  security:
-    allowInsecureImages: true
-
-commonLabels:
-  app: {{ .Release.Name }}
-image:
-  repository: bitnamilegacy/postgresql
-  tag: 17.6.0-debian-12-r4
-architecture: standalone
-primary:
-  networkPolicy:
-    enabled: false
-auth:
-  postgresPassword: supersecret
-  username: keycloak
-  password: supersecret
-  database: keycloak
+type: postgresql
+mode: standalone
+version:
+  postgresql: "17"
+backups:
+  enabled: false
+cluster:
+  additionalLabels:
+    app: {{ .Release.Name }}
+  instances: 1
+  storage:
+    size: 1Gi
+  initdb:
+    database: keycloak
+    owner: keycloak
