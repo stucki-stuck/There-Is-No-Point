@@ -1,0 +1,4 @@
+---
+config:
+  data:
+    INHERITED_LABELS: app

@@ -5,12 +5,29 @@
 repositories:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
+  - name: cnpg
+    url: https://cloudnative-pg.github.io/charts
 
 releases:
+  - name: cnpg
+    namespace: cnpg-system
+    createNamespace: true
+    chart: cnpg/cloudnative-pg
+    version: 0.29.0
+    wait: true
+    labels:
+      domain: dependencies
+      phase: install
+    values:
+      - ./values/apps/dependencies/cnpg.yaml
+
   - name: keycloak-postgresql-mesh
     chart: ../charts/meshes/mesh
     namespace: keycloak
     createNamespace: true
+    wait: true
+    needs:
+      - cnpg-system/cnpg
     labels:
       domain: dependencies
       phase: mesh
@@ -31,9 +48,12 @@ releases:
   - name: keycloak-postgresql-app
     namespace: keycloak
     createNamespace: true
-    chart: bitnami/postgresql
-    version: 16.7.26
+    chart: cnpg/cluster
+    version: 0.7.0
     wait: true
+    needs:
+      - cnpg-system/cnpg
+      - keycloak-postgresql-mesh
     labels:
       domain: dependencies
       phase: install

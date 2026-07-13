@@ -34,10 +34,12 @@ postgresql:
   enabled: false
 
 externalDatabase:
-  host: keycloak-postgresql-app.keycloak
+  host: keycloak-postgresql-app-cluster-rw.keycloak
   user: keycloak
-  password: supersecret
   database: keycloak
+  existingSecret: keycloak-postgresql-app-cluster-app
+  existingSecretUserKey: "user"
+  existingSecretPasswordKey: "password"
 
 keycloakConfigCli:
   enabled: true
